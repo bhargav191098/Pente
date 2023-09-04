@@ -1,21 +1,57 @@
 import threading
 import time
-
 import subprocess
 
 
 
-'''
-At this stage, I have done till white player - plays the first move. Then the command flows to the agent
-The agent makes the next move.
-There is no timer as of now.
-Also need to populate  the grid from the playdata.txt
-Need to write code to capture
-need to write code to count black and white coins captured.
-
-'''
-
 firstWhiteMove = True
+player = input("What color do you want to play?")
+agent_side = ""
+player_side = ""
+player_coin = ""
+agent_coin = ""
+player_coins = 0
+agent_coins = 0
+white_move_number = 0 
+
+
+
+if(player.lower()=="black"):
+	agent_side = "WHITE"
+	player_side = "BLACK"
+	player_coin = 'b'
+	agent_coin = 'w'
+elif(player.lower()=="white"):
+	agent_side = "BLACK"
+	player_side = "WHITE"
+	player_coin = 'w'
+	agent_coin = 'b'
+else:
+	print("Please enter a proper player name")
+	exit()
+
+
+print("The AI agent has 100 seconds. You have infinite amount of time.\n")
+print("Game starts! ********************************************\n")
+
+agent_time = 100.0
+
+white_captured = 0
+black_captured = 0
+
+
+lastMoveX = -1
+lastMoveY = -1
+
+gameRun = True
+moveMade = False
+
+
+board = [['.' for _ in range(19)] for _ in range(19)]
+
+col_names = ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P','Q','R','S','T']
+row_names = [19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1]
+
 
 '''
 def makeBoardAndTest():
@@ -81,8 +117,7 @@ def captureCoins(x,y):
 
 	player = player_coin
 	opponent = agent_coin
-	print("PLAYER ",player_coin)
-	print("opponent ",opponent)
+	
 
 	moveCaptureCount = 0
 
@@ -421,53 +456,6 @@ def check5piecesCriteria(x,y):
 	return (checkHorizontalGrowth(x,y) or checkVerticalGrowth(x,y) or checkLeftRightDiagonal(x,y) or checkRightLeftDiagonal(x,y))
 
 
-player = input("What color do you want to play?")
-agent_side = ""
-player_side = ""
-player_coin = ""
-agent_coin = ""
-player_coins = 0
-agent_coins = 0
-white_move_number = 0 
-
-
-
-if(player.lower()=="black"):
-	agent_side = "WHITE"
-	player_side = "BLACK"
-	player_coin = 'b'
-	agent_coin = 'w'
-elif(player.lower()=="white"):
-	agent_side = "BLACK"
-	player_side = "WHITE"
-	player_coin = 'w'
-	agent_coin = 'b'
-else:
-	print("Please enter a proper player name")
-	exit()
-
-
-print("You have 300 seconds in total. The AI agent also has 300 seconds.\n")
-print("If you don't make a move within your 300 seconds, it is automatically considered forfeiting.")
-print("By default, if you are white, your first move will be placing a white coin at the center of the board.")
-print("Game starts! ********************************************\n")
-
-agent_time = 100.0
-
-white_captured = 0
-black_captured = 0
-
-
-lastMoveX = -1
-lastMoveY = -1
-
-gameRun = True
-moveMade = False
-
-
-board = [['.' for _ in range(19)] for _ in range(19)]
-
-
 def timer_function(interval, callback):
     time.sleep(interval)
     callback()
@@ -485,22 +473,6 @@ def agent_callback():
 	else:
 		print("Thread callback but not doing anything!")
 
-
-
-# Set the interval for the timer in seconds
-timer_interval = 10
-
-# Create a thread for the timer function
-#timer_thread = threading.Thread(target=timer_function, args=(timer_interval, my_callback_function))
-
-
-
-
-'''
-rowData = [-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
-colData = {'A':0,'B':1,'C':2,'D':3,'E':4,'F':5,'G':6,'H':7,'J':8,
-		   'K':9,'L':10,'M':11,'N':12,'O':13,'P':14,''
-		  }'''
 
 def checkForCutCoins(side):
 	global player_coins,agent_coins,black_captured,white_captured
@@ -558,6 +530,7 @@ def agentMakeMove():
 	print("Agent making move ....\n")
 	global moveMade,agent_time,agent_coins
 	'''
+	Not a viable route!
 	agent_thread = threading.Thread(target=timer_function,args=(agent_time,agent_callback))
 	
 	# Start the timer thread
@@ -606,8 +579,6 @@ def isSecondWhiteMoveSafe(x,y):
 		return False
 	return True
 
-col_names = ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P','Q','R','S','T']
-row_names = [19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1]
 
 def print_pente_board():
     size = len(board)
@@ -689,10 +660,6 @@ def playerMakeMove():
 			print("You win!")
 			exit()
 		agentMakeMove()
-
-
-
-
 
 print("Game run value ",gameRun)
 remaining_agent_time = agent_time
